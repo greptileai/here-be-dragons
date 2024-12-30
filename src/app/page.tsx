@@ -53,7 +53,7 @@ export default function Home() {
           if (isComplete) {
             break;
           }
-          setStatus(`Still indexing... (attempt ${attempts}/${maxAttempts})`);
+          setStatus(`Still indexing... (progress ${attempts}/${maxAttempts})`);
         } catch (error) {
           console.error('Status check failed:', error);
           setStatus(`Status check attempt ${attempts} failed, retrying...`);
@@ -64,7 +64,7 @@ export default function Home() {
         throw new Error('Indexing timed out after 4 minutes. Try again later.');
       }
 
-      setStatus('Indexing complete. Searching for interesting comments...');
+      setStatus('Indexing complete. Searching for wacky stuff...');
       const data = await GREPTILE_API.queryRepo(repository);
       setResults(data);
       setStatus('');
@@ -83,9 +83,9 @@ export default function Home() {
         {/* Header */}
         <div className="mb-8 text-center space-y-2">
           <h1 className="text-4xl font-bold tracking-tight">
-            Here Be Dragons
+          🐉 Here Be Dragons 
           </h1>
-          <p className="text-slate-500">Discover interesting code comments and quirks</p>
+          <p className="text-slate-500">Discover quirks that make code human</p>
         </div>
 
         {/* Search Card */}
@@ -93,7 +93,7 @@ export default function Home() {
           <CardHeader>
             <CardTitle>Search Repository</CardTitle>
             <CardDescription>
-              Enter a GitHub repository to find interesting comments and development quirks
+              Enter a GitHub repository to find wacky stuff
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -126,7 +126,6 @@ export default function Home() {
   <CardHeader>
     <CardTitle>Discoveries</CardTitle>
     <CardDescription>
-      Quirky stuff
     </CardDescription>
   </CardHeader>
   {loading ? (
