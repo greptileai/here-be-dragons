@@ -11,13 +11,13 @@ interface GraptileAPI {
   
     async attemptIndexing(repository: string, branch: string) {
         const headers: HeadersInit = {
-          Authorization: `Bearer ${process.env.GREPTILE_API_KEY}`,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_GREPTILE_API_KEY}`,
           "Content-Type": "application/json",
         };
       
         // Only add GitHub token if it exists
-        if (process.env.GITHUB_TOKEN) {
-          headers["X-Github-Token"] = process.env.GITHUB_TOKEN;
+        if (process.env.NEXT_PUBLIC_GITHUB_TOKEN) {
+          headers["X-Github-Token"] = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
         }
       
         return await fetch(`${process.env.NEXT_PUBLIC_GREPTILE_API_URL}/repositories`, {
@@ -71,11 +71,11 @@ interface GraptileAPI {
             try {
               // Construct headers conditionally
               const headers: HeadersInit = {
-                Authorization: `Bearer ${process.env.GREPTILE_API_KEY}`,
+                Authorization: `Bearer ${process.env.NEXT_PUBLIC_GREPTILE_API_KEY}`,
               };
       
-              if (process.env.GITHUB_TOKEN) {
-                headers["X-Github-Token"] = process.env.GITHUB_TOKEN;
+              if (process.env.NEXT_PUBLIC_GITHUB_TOKEN) {
+                headers["X-Github-Token"] = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
               }
       
               const response = await fetch(url, {
@@ -107,12 +107,12 @@ interface GraptileAPI {
         try {
           // Construct headers conditionally
           const headers: HeadersInit = {
-            Authorization: `Bearer ${process.env.GREPTILE_API_KEY}`,
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_GREPTILE_API_KEY}`,
             "Content-Type": "application/json",
           };
       
-          if (process.env.GITHUB_TOKEN) {
-            headers["X-Github-Token"] = process.env.GITHUB_TOKEN;
+          if (process.env.NEXT_PUBLIC_GITHUB_TOKEN) {
+            headers["X-Github-Token"] = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
           }
       
           const response = await fetch(`${process.env.NEXT_PUBLIC_GREPTILE_API_URL}/query`, {
