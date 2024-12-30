@@ -26,8 +26,8 @@ Create a .env.local file in the root directory and add your API keys:
 
 ```bash
 NEXT_PUBLIC_GREPTILE_API_URL=https://api.greptile.com/v2
-NEXT_PUBLIC_GREPTILE_API_KEY=your_greptile_api_key
-NEXT_PUBLIC_GITHUB_TOKEN=your_github_token
+GREPTILE_API_KEY=your_greptile_api_key
+GITHUB_TOKEN=your_github_token
 ```
 
 Run the development server:
