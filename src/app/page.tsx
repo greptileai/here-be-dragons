@@ -106,7 +106,7 @@ export default function Home() {
                 />
               </div>
               <Button type="submit" disabled={loading}>
-                {loading ? "Searching..." : "Find Dragons"}
+                {loading ? "Searching..." : "Find"}
               </Button>
             </form>
           </CardContent>
