@@ -85,7 +85,7 @@ export default function Home() {
           <h1 className="text-4xl font-bold tracking-tight">
           🐉 Here Be Dragons 
           </h1>
-          <p className="text-slate-500">Discover quirks that make code human</p>
+          <p className="text-slate-500">Discover strange and wonderful comments</p>
         </div>
 
         {/* Search Card */}
@@ -93,7 +93,7 @@ export default function Home() {
           <CardHeader>
             <CardTitle>Search Repository</CardTitle>
             <CardDescription>
-              Enter a GitHub repository to find wacky stuff
+              Enter a GitHub repository to find interesting comments
             </CardDescription>
           </CardHeader>
           <CardContent>
