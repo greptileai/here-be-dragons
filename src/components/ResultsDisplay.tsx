@@ -14,81 +14,149 @@ interface SearchResult {
 }
 
 interface ResultsDisplayProps {
-  results: SearchResult | null;
+  results: SearchResult;
+  sourceFiles: string | null;
 }
 
-const CodeBlock = ({ content }: { content: string }) => (
-    <div className="bg-slate-900 border border-slate-200 rounded-lg p-4 my-4 shadow-sm">
-      <pre>
-        <code className="text-slate-100 font-mono text-sm whitespace-pre-wrap">
+const SourceFiles: React.FC<{ content: string }> = ({ content }) => {
+  const links = content
+    .split('\n')
+    .filter(line => line.includes(']('))
+    .map(line => {
+      const titleMatch = line.match(/\[(.*?)\]/);
+      const urlMatch = line.match(/\((.*?)\)/);
+      return {
+        title: titleMatch ? titleMatch[1] : '',
+        url: urlMatch ? urlMatch[1] : ''
+      };
+    });
+
+  return (
+    <Card className="mt-8 bg-slate-50 border border-slate-200">
+      <CardContent className="pt-6">
+        <div className="flex items-center gap-2 mb-4 text-slate-800">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="18" 
+            height="18" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          >
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          <span className="font-medium">Source Files</span>
+        </div>
+        <div className="grid gap-2">
+          {links.map((link, index) => (
+            <a 
+              key={index}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors group"
+            >
+              <span className="text-slate-400 font-mono text-sm group-hover:text-blue-500">
+                {link.title}
+              </span>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="14" 
+                height="14" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                className="ml-2 text-slate-400 group-hover:text-blue-500"
+              >
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const CodeBlock = ({ content, sourceUrl, fileName }: { content: string, sourceUrl?: string, fileName?: string }) => (
+  <div className="relative bg-slate-900 rounded-lg p-4 my-4">
+    {(fileName || sourceUrl) && (
+      <div className="flex items-center justify-between mb-2 text-slate-400 text-sm">
+        {fileName && <span className="font-mono">{fileName}</span>}
+        {sourceUrl && (
+          <a 
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:text-blue-300 transition-colors ml-2"
+          >
+            View on GitHub ↗
+          </a>
+        )}
+      </div>
+    )}
+    
+    <div className="relative">
+      <pre className="overflow-x-auto">
+        <code className="text-slate-100 font-mono text-sm leading-relaxed whitespace-pre-wrap break-words">
           {content.trim()}
         </code>
       </pre>
     </div>
-  );
+  </div>
+);
 
-const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results }) => {
+const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, sourceFiles }) => {
   if (!results) return null;
 
-  const renderMessage = (message: string) => {
-    const paragraphs = message.split('\n\n');
+  const processMessageContent = (message: string) => {
+    const discoveries = message.split('\n\n');
     
-    return paragraphs.map((paragraph, idx) => {
-      // Check if the paragraph is a code block (starts with triple quotes)
-      if (paragraph.startsWith("```")) {
-        // Remove the triple quotes at the start and end
-        const cleanContent = paragraph.replace(/^[`]{3}|[`]{3}$/g, '');
-        return <CodeBlock key={idx} content={cleanContent} />;
-      }
+    return discoveries.map((discovery, idx) => {
+      const urlMatch = discovery.match(/\[Source:.*?\]\((.*?)\)/);
+      const sourceUrl = urlMatch ? urlMatch[1] : undefined;
+      
+      const fileMatch = discovery.match(/\[Source: (.*?)\]/);
+      const fileName = fileMatch ? fileMatch[1] : undefined;
+      
+      const cleanContent = discovery
+        .replace(/\[Source:.*?\]\(.*?\)/, '')
+        .replace(/```/g, '')
+        .trim();
 
-      // Regular paragraph
       return (
-        <p key={idx} className="my-4 text-slate-100">
-          {paragraph}
-        </p>
+        <div key={idx} className="mb-8">
+          <CodeBlock 
+            content={cleanContent} 
+            sourceUrl={sourceUrl} 
+            fileName={fileName}
+          />
+        </div>
       );
     });
   };
 
   return (
-    <ScrollArea className="h-[500px] rounded-md border p-4">
-      <div className="space-y-8">
-        {/* AI Analysis */}
+    <ScrollArea className="h-[600px] rounded-md border p-6">
+      <div className="space-y-6">
         {results.message && (
           <div className="prose prose-slate max-w-none">
-            {renderMessage(results.message)}
+            {processMessageContent(results.message)}
           </div>
         )}
         
-        {/* Source files */}
-        {results.sources?.filter(source => source?.content && source.content.trim() !== '').map((source, index) => (
-          <Card key={index} className="border border-slate-200">
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between mb-4">
-                <h3 className="font-mono text-sm font-semibold text-slate-700">
-                  {source.file}
-                </h3>
-                {source.url && (
-                  <a 
-                    href={source.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
-                  >
-                    View on GitHub →
-                  </a>
-                )}
-              </div>
-              <div className="bg-slate-900 border border-slate-200 rounded-lg p-4 shadow-sm">
-                <pre>
-                    <code className="text-slate-100 font-mono text-sm whitespace-pre-wrap">
-                    {source.content}
-                    </code>
-                </pre>
-                </div>
-            </CardContent>
-          </Card>
-        ))}
+        {sourceFiles && (
+          <SourceFiles content={sourceFiles} />
+        )}
       </div>
     </ScrollArea>
   );

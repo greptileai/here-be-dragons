@@ -10,12 +10,12 @@ import GREPTILE_API from '../lib/greptile';
 import { SearchResult } from '../types';
 import ResultsDisplay from '../components/ResultsDisplay';
 
-
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
   const [repository, setRepository] = useState('');
-  const [results, setResults] = useState<SearchResult | null>(null);
+  const [discoveries, setDiscoveries] = useState<any>(null);
+  const [sourceFiles, setSourceFiles] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   
   const validateRepo = (repo: string) => {
@@ -32,7 +32,8 @@ export default function Home() {
 
     setLoading(true);
     setError(null);
-    setResults(null);
+    setDiscoveries(null);
+    setSourceFiles(null);
     setStatus('Starting indexing process...');
 
     try {
@@ -65,9 +66,22 @@ export default function Home() {
       }
 
       setStatus('Indexing complete. Searching for wacky stuff...');
-      const data = await GREPTILE_API.queryRepo(repository);
-      setResults(data);
-      setStatus('');
+      // Get initial discoveries
+      const results = await GREPTILE_API.queryRepo(repository);
+      setDiscoveries(results.data);
+      setStatus('Loading source files...');
+
+      // Fetch source files separately
+      if (results.data.message) {
+        try {
+          const sourceFilesResult = await GREPTILE_API.findSourceFiles(repository, results.data.message);
+          setSourceFiles(sourceFilesResult.data.message);
+          setStatus('');
+        } catch (err) {
+          console.error('Source files fetch error:', err);
+          // Don't set error state - just log it since we still have discoveries to show
+        }
+      }
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -122,30 +136,33 @@ export default function Home() {
         )}
 
         {/* Results Section */}
-<Card>
-  <CardHeader>
-    <CardTitle>Discoveries</CardTitle>
-    <CardDescription>
-    </CardDescription>
-  </CardHeader>
-  {loading ? (
-    <CardContent>
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-20 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-      </div>
-    </CardContent>
-  ) : results ? (
-    <ResultsDisplay results={results} />
-  ) : (
-    <CardContent>
-      <div className="text-center py-12 text-slate-500">
-        Enter a repository to start discovering interesting code comments
-      </div>
-    </CardContent>
-  )}
-</Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Discoveries</CardTitle>
+            <CardDescription>
+            </CardDescription>
+          </CardHeader>
+          {loading ? (
+            <CardContent>
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+            </CardContent>
+          ) : discoveries ? (
+            <ResultsDisplay 
+              results={discoveries} 
+              sourceFiles={sourceFiles}
+            />
+          ) : (
+            <CardContent>
+              <div className="text-center py-12 text-slate-500">
+                Enter a repository to start discovering interesting code comments
+              </div>
+            </CardContent>
+          )}
+        </Card>
       </div>
     </div>
   );
