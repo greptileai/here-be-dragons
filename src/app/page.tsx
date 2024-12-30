@@ -42,7 +42,7 @@ export default function Home() {
 
       let isComplete = false;
       let attempts = 0;
-      const maxAttempts = 24; // 2 minutes (24 * 5 seconds)
+      const maxAttempts = 48; // 4 minutes (48 * 5 seconds)
 
       while (!isComplete && attempts < maxAttempts) {
         await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
@@ -61,7 +61,7 @@ export default function Home() {
       }
 
       if (!isComplete) {
-        throw new Error('Indexing timed out after 2 minutes');
+        throw new Error('Indexing timed out after 4 minutes. Try again later.');
       }
 
       setStatus('Indexing complete. Searching for interesting comments...');
