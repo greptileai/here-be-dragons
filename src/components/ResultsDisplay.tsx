@@ -35,18 +35,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results }) => {
     
     return paragraphs.map((paragraph, idx) => {
       // Check if the paragraph is a code block (starts with triple quotes)
-      if (paragraph.startsWith("```")) {
-        // Remove the triple quotes at the start and end
-        const cleanContent = paragraph.replace(/^[`]{3}|[`]{3}$/g, '');
-        return <CodeBlock key={idx} content={cleanContent} />;
-      }
+    //   if (paragraph.startsWith("```")) {
+    //     // Remove the triple quotes at the start and end
+    //     const cleanContent = paragraph.replace(/^[`]{3}|[`]{3}$/g, '');
+    //     return <CodeBlock key={idx} content={cleanContent} />;
+    //   }
 
-      // Regular paragraph
-      return (
-        <p key={idx} className="my-4 text-slate-100">
-          {paragraph}
-        </p>
-      );
+    //   // Regular paragraph
+    //   return (
+    //     <p key={idx} className="my-4 text-slate-700">
+    //       {paragraph}
+    //     </p>
+    //   );
+    const cleanContent = paragraph.replace(/^[`]{3}|[`]{3}$/g, '');
+    return <CodeBlock key={idx} content={cleanContent} />;
     });
   };
 

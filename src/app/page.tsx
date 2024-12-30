@@ -42,7 +42,7 @@ export default function Home() {
 
       let isComplete = false;
       let attempts = 0;
-      const maxAttempts = 48; // 4 minutes (48 * 5 seconds)
+      const maxAttempts = 100; // 4 minutes (48 * 5 seconds)
 
       while (!isComplete && attempts < maxAttempts) {
         await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
@@ -53,7 +53,7 @@ export default function Home() {
           if (isComplete) {
             break;
           }
-          setStatus(`Still indexing... (progress ${attempts}/${maxAttempts})`);
+          setStatus(`Still indexing... You can come back after a while (progress ${attempts}/${maxAttempts})`);
         } catch (error) {
           console.error('Status check failed:', error);
           setStatus(`Status check attempt ${attempts} failed, retrying...`);
@@ -61,7 +61,7 @@ export default function Home() {
       }
 
       if (!isComplete) {
-        throw new Error('Indexing timed out after 4 minutes. Try again later.');
+        throw new Error('Indexing timed out after several minutes. Try again later.');
       }
 
       setStatus('Indexing complete. Searching for wacky stuff...');
